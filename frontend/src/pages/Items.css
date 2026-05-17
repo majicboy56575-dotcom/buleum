@@ -1,0 +1,251 @@
+.items-page {
+  padding: 40px 20px;
+  background-color: var(--bg-secondary);
+  min-height: calc(100vh - 64px - 150px);
+}
+
+.items-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.items-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #212529;
+}
+
+.write-btn {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--border-radius-md);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(255, 126, 54, 0.3);
+  transition: var(--transition-normal);
+}
+
+.write-btn:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 126, 54, 0.5);
+}
+
+/* Items Grid */
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.item-list-card {
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  transition: var(--transition-normal);
+  border: 1px solid var(--border-color);
+  display: flex;
+  height: 160px;
+}
+
+.item-list-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: transparent;
+}
+
+.item-list-image-wrapper {
+  width: 160px;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-secondary);
+}
+
+.item-list-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--transition-normal);
+}
+
+.item-list-card:hover .item-list-image {
+  transform: scale(1.05);
+}
+
+.item-list-content {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.item-list-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #212529;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-list-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.item-list-location {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.item-list-status {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--border-radius-sm);
+  display: inline-block;
+  width: fit-content;
+}
+
+.item-list-status[data-status="대기중"], .item-list-status:not([data-status]) {
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+}
+
+.item-list-status[data-status="예약중"], .item-list-status[data-status="진행중"] {
+  background-color: #FFF4E6;
+  color: #FD7E14;
+}
+
+.item-list-status[data-status="완료"] {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.item-list-footer {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  gap: 6px;
+}
+
+.no-items {
+  text-align: center;
+  padding: 60px 0;
+  color: var(--text-secondary);
+}
+
+.no-items p {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 640px) {
+  .items-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Sidebar Layout */
+.items-layout-with-sidebar {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.items-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  padding: 24px;
+  position: sticky;
+  top: 88px;
+}
+
+.items-main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Filter Sections */
+.filter-section {
+  margin-bottom: 24px;
+}
+
+.filter-section:last-child {
+  margin-bottom: 0;
+}
+
+.filter-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #212529;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #4D5159;
+  margin-bottom: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-checkbox:last-child {
+  margin-bottom: 0;
+}
+
+.filter-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+}
+
+.location-list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.location-list::-webkit-scrollbar {
+  width: 6px;
+}
+.location-list::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+.location-list::-webkit-scrollbar-thumb {
+  background: #C2C6CE;
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .items-layout-with-sidebar {
+    flex-direction: column;
+  }
+  .items-sidebar {
+    width: 100%;
+    position: static;
+  }
+}

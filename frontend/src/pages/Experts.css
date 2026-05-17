@@ -1,0 +1,242 @@
+.experts-page {
+  padding: 40px 20px;
+  background-color: var(--bg-secondary);
+  min-height: calc(100vh - 64px);
+}
+
+.experts-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.experts-header {
+  margin-bottom: 24px;
+}
+
+.experts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.expert-card {
+  background-color: white;
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  transition: var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+}
+
+.expert-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+}
+
+.expert-image {
+  width: 100%;
+  height: 200px;
+}
+
+.expert-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.expert-info {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.expert-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.expert-category {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary-color);
+  background-color: var(--primary-light);
+  padding: 4px 8px;
+  border-radius: var(--border-radius-sm);
+}
+
+.expert-rating {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.expert-rating .star {
+  color: #FFB020;
+}
+
+.expert-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #212529;
+  margin-bottom: 8px;
+}
+
+.expert-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.expert-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.expert-location {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.expert-contact-btn {
+  background-color: white;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  padding: 6px 12px;
+  border-radius: var(--border-radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.expert-contact-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Expert Profile Modal */
+.expert-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.expert-modal-content {
+  background-color: white;
+  width: 90%;
+  max-width: 400px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: modalFadeIn 0.2s ease-out forwards;
+}
+
+.expert-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.expert-modal-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #212529;
+  margin: 0;
+}
+
+.expert-modal-body {
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modal-expert-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.modal-expert-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-expert-info {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.modal-expert-info .expert-category {
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.modal-expert-info .expert-name {
+  margin-bottom: 8px;
+}
+
+.expert-details {
+  margin-top: 16px;
+  text-align: left;
+  background-color: var(--bg-secondary);
+  padding: 16px;
+  border-radius: var(--border-radius-md);
+}
+
+.expert-details p {
+  font-size: 14px;
+  color: #4D5159;
+  margin-bottom: 8px;
+}
+
+.expert-details p:last-child {
+  margin-bottom: 0;
+}
+
+.modal-expert-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.modal-expert-actions .btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--border-radius-md);
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+}
+
+.modal-expert-actions .btn-outline {
+  background-color: white;
+  border: 1px solid var(--border-color);
+  color: #4D5159;
+}
+
+.modal-expert-actions .btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}

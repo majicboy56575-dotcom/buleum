@@ -1,0 +1,133 @@
+.verification-page {
+  padding: 40px 20px;
+  background-color: var(--bg-secondary);
+  min-height: calc(100vh - 64px);
+  display: flex;
+  justify-content: center;
+}
+
+.verification-container {
+  width: 100%;
+  max-width: 600px;
+}
+
+.verification-card {
+  background-color: white;
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+}
+
+.verification-guide {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: var(--border-radius-md);
+  margin-bottom: 32px;
+  border: 1px solid var(--border-color);
+}
+
+.verification-guide h3 {
+  font-size: 16px;
+  color: #212529;
+  margin-bottom: 12px;
+}
+
+.verification-guide ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.verification-guide li {
+  font-size: 14px;
+  color: #4D5159;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.verification-guide .emoji {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.verification-form .form-group {
+  margin-bottom: 24px;
+}
+
+.verification-form label {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: #212529;
+  margin-bottom: 12px;
+}
+
+.verify-select {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-size: 15px;
+  outline: none;
+  font-family: inherit;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  background-color: #fafbfc;
+}
+
+.file-upload-label:hover {
+  background-color: var(--bg-secondary);
+  border-color: var(--primary-color);
+}
+
+.upload-icon {
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.upload-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-align: center;
+}
+
+.help-text {
+  font-size: 13px;
+  color: #FF5252;
+  margin-top: 8px;
+}
+
+.submit-verify-btn {
+  width: 100%;
+  padding: 16px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  margin-top: 16px;
+}
+
+.submit-verify-btn:hover {
+  background-color: var(--primary-hover);
+}

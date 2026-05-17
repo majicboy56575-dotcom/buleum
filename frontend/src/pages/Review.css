@@ -1,0 +1,133 @@
+.review-page {
+  padding: 40px 20px;
+  background-color: var(--bg-secondary);
+  min-height: calc(100vh - 64px);
+  display: flex;
+  justify-content: center;
+}
+
+.review-container {
+  width: 100%;
+  max-width: 600px;
+}
+
+.review-card {
+  background-color: white;
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+}
+
+.target-profile {
+  display: flex;
+  align-items: center;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 24px;
+}
+
+.target-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+}
+
+.target-avatar span {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.target-info h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #212529;
+  margin-bottom: 4px;
+}
+
+.target-info p {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.rating-section {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.rating-section h3 {
+  font-size: 16px;
+  color: #4D5159;
+  margin-bottom: 16px;
+}
+
+.star-rating {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 48px;
+  color: var(--border-color);
+  cursor: pointer;
+  transition: color 0.2s ease;
+  line-height: 1;
+}
+
+.star-btn.active {
+  color: #FFB020;
+}
+
+.star-btn:hover {
+  transform: scale(1.1);
+}
+
+.review-text-section {
+  margin-bottom: 32px;
+}
+
+.review-text-section h3 {
+  font-size: 16px;
+  color: #4D5159;
+  margin-bottom: 12px;
+}
+
+.review-text-section textarea {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-size: 15px;
+  resize: vertical;
+}
+
+.review-text-section textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.submit-review-btn {
+  width: 100%;
+  padding: 16px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.submit-review-btn:hover {
+  background-color: var(--primary-hover);
+}
