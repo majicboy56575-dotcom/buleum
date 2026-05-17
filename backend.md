@@ -1,129 +1,166 @@
-# 부름(Buleum) 백엔드 개발 요청 명세서 (backend.md)
+# 백엔드 현황 문서 (backend.md)
 
-본 문서는 효도 대행 및 심부름 서비스 '부름(Buleum)'의 프론트엔드 UI에 정확히 매칭되는 백엔드 API 및 데이터베이스 개발 명세서입니다. 디자인(프론트엔드)에 구현되지 않은 불필요한 기능은 제외하고 최적화되었습니다.
+최종 업데이트: 2026-05-17
 
-## 1. 개발 환경 및 기술 스택
-*   **Framework:** FastAPI
-*   **Database:** SQLite (개발 환경 및 프로덕션 환경 모두 가볍고 빠른 SQLite 단일 사용)
-*   **ORM:** SQLAlchemy
-*   **Authentication:** JWT (JSON Web Token)
-*   **Real-time Communication:** WebSockets (채팅용)
-*   **File Handling:** Python-multipart (로컬 디렉토리에 이미지/파일 저장)
+## 1. 기술 스택
 
-## 2. 데이터베이스 스키마 (SQLite 테이블 구조)
+| 항목 | 버전/설정 |
+| :--- | :--- |
+| Framework | FastAPI |
+| Database | SQLite (`backend/buleum.db`) |
+| ORM | SQLAlchemy 2.0+ |
+| 인증 | JWT (HS256, 유효기간 7일) |
+| 실시간 통신 | WebSocket |
+| 파일 업로드 | python-multipart (로컬 저장) |
+| 비밀번호 해싱 | bcrypt |
 
-### 2.1. User (사용자)
-*   `id` (PK)
-*   `email` (Unique)
-*   `password_hash`
-*   `nickname` (Unique)
-*   `location` (활동 동네, 예: 역삼동)
-*   `manner_temperature` (매너온도, 기본 36.5)
-*   `profile_image_url`
-*   `is_verified` (신원 인증 여부, Boolean)
+## 2. 프로젝트 구조
 
-### 2.2. Buleum (부름 요청글)
-*   `id` (PK)
-*   `user_id` (FK -> User.id)
-*   `title`
-*   `price` (보수 금액)
-*   `description` (요청 상세 내용)
-*   `location` (부름이 필요한 장소)
-*   `image_url` (첨부 이미지)
-*   `status` (상태: 대기중, 진행중, 완료)
-*   `likes` (관심 수)
-*   `chat_count` (채팅 수)
-*   `created_at`
+```text
+backend/
+├── main.py            # FastAPI 앱 진입점, WebSocket 엔드포인트
+├── database.py        # SQLite 연결 설정 (buleum.db)
+├── models.py          # SQLAlchemy ORM 모델 정의
+├── schemas.py         # Pydantic 스키마 (요청/응답)
+├── auth.py            # JWT 발급/검증, bcrypt 해싱
+├── requirements.txt   # 패키지 목록
+├── routers/
+│   ├── users.py       # 인증, 프로필, 내 요청/수행 목록
+│   ├── items.py       # 부름글 CRUD, 좋아요, 파일 업로드
+│   ├── town.py        # 동네생활 게시글
+│   ├── chat.py        # 채팅방 REST + 미디어 업로드
+│   ├── others.py      # 전문가, 알림, 결제, 후기, 신원 인증
+│   └── admin.py       # 관리자 전용 통계/사용자/게시글 관리
+└── uploads/           # 업로드된 파일 저장 디렉토리
+    └── chat/          # 채팅 이미지·동영상
+```
 
-### 2.3. TownPost (동네생활 게시글)
-*   `id` (PK)
-*   `user_id` (FK -> User.id)
-*   `category` (예: 동네질문, 동네맛집, 일상, 동네소식)
-*   `content`
-*   `location`
-*   `image_url` (첨부 이미지)
-*   `created_at`
+## 3. 인증 설정 (auth.py)
 
-### 2.4. ChatRoom & ChatMessage (채팅)
-*   **ChatRoom**: `id` (PK), `buleum_id` (FK, Nullable), `requester_id` (요청자 FK), `helper_id` (수행자 FK), `created_at`
-*   **ChatMessage**: `id` (PK), `room_id` (FK), `sender_id` (FK), `content`, `is_read`, `created_at`
+- **알고리즘:** HS256
+- **토큰 유효기간:** 7일 (60 × 24 × 7 분)
+- **SECRET_KEY:** `supersecretkey_buleum_project` (프로덕션 시 환경변수로 교체 필요)
+- **OAuth2 tokenUrl:** `/api/auth/login`
 
-### 2.5. Expert (전문가 프로필)
-*   `id` (PK)
-*   `user_id` (FK -> User.id)
-*   `category` (예: 요양보호사, 간병인 등)
-*   `rating` (평점)
-*   `review_count` (리뷰 수)
-*   `description` (전문가 소개)
+## 4. API 엔드포인트 전체 목록
 
-### 2.6. Notification (알림)
-*   `id` (PK)
-*   `user_id` (FK -> User.id)
-*   `type` (알림 종류: chat, accept, comment, review 등)
-*   `content` (알림 메시지)
-*   `is_read` (Boolean)
-*   `created_at`
+### 4.1 인증 및 사용자 (`routers/users.py`)
 
-### 2.7. Payment (안전결제 예치금)
-*   `id` (PK)
-*   `buleum_id` (FK)
-*   `payer_id` (FK)
-*   `amount`
-*   `payment_method`
-*   `status` (예치됨, 지급완료)
+| 메서드 | 경로 | 인증 필요 | 설명 |
+| :--- | :--- | :---: | :--- |
+| POST | `/api/auth/register` | | 회원가입 |
+| POST | `/api/auth/login` | | 로그인 (JWT 발급) |
+| GET | `/api/users/me` | O | 내 프로필 조회 |
+| PUT | `/api/users/me` | O | 내 프로필 수정 (닉네임, 동네, 프로필 이미지 URL) |
+| GET | `/api/users/me/requests` | O | 내가 작성한 부름글 목록 |
+| GET | `/api/users/me/progress` | O | 내가 헬퍼로 참여 중인 부름글 목록 |
 
-### 2.8. Review (후기 및 평가)
-*   `id` (PK)
-*   `reviewer_id` (FK)
-*   `target_user_id` (FK)
-*   `buleum_id` (FK)
-*   `rating` (1~5 별점)
-*   `content`
+### 4.2 부름(Buleum) 게시글 (`routers/items.py`, prefix: `/api/items`)
 
-### 2.9. Verification (신원 인증 서류)
-*   `id` (PK)
-*   `user_id` (FK)
-*   `type` (신분증, 요양보호사 자격증 등)
-*   `file_url` (서류 이미지 경로)
-*   `status` (심사중, 승인됨, 거절됨)
+| 메서드 | 경로 | 인증 필요 | 설명 |
+| :--- | :--- | :---: | :--- |
+| GET | `/api/items` | | 목록 조회 (쿼리: `search`, `location`) |
+| POST | `/api/items` | O | 부름글 작성 (multipart/form-data, 이미지 포함) |
+| GET | `/api/items/{item_id}` | | 부름글 상세 조회 |
+| PUT | `/api/items/{item_id}` | O | 부름글 수정 (작성자 본인만) |
+| DELETE | `/api/items/{item_id}` | O | 부름글 삭제 (채팅방 유지, 결제 분리 보존) |
+| PUT | `/api/items/{item_id}/status` | O | 상태 변경 (`대기중` / `진행중` / `완료`) |
+| POST | `/api/items/{item_id}/like` | O | 관심(좋아요) 토글 |
+| GET | `/api/items/liked` | O | 내가 관심 표시한 부름글 목록 |
 
-## 3. API 엔드포인트 명세 (UI 구현 완료된 기능 중심)
+### 4.3 동네생활 (`routers/town.py`, prefix: `/api/town`)
 
-### 3.1. Auth & Profile (`/login`, `/signup`, `/profile`)
-*   `POST /api/auth/register`: 회원가입
-*   `POST /api/auth/login`: 로그인 (JWT 토큰 발급)
-*   `GET /api/users/me`: 내 프로필 조회
-*   `PUT /api/users/me`: 내 프로필 수정 (이미지, 닉네임, 동네)
+| 메서드 | 경로 | 인증 필요 | 설명 |
+| :--- | :--- | :---: | :--- |
+| GET | `/api/town/posts` | | 게시글 목록 조회 (쿼리: `category`) |
+| POST | `/api/town/posts` | O | 게시글 작성 (multipart/form-data, 이미지 포함) |
 
-### 3.2. Buleum (부름) (`/items`, `/items/write`, `/items/:id`, `/requests`, `/progress`)
-*   `GET /api/items`: 부름 목록 전체/검색 조회 (필터: 검색어, 지역)
-*   `POST /api/items`: 신규 부름 작성 (이미지 파일 업로드 지원)
-*   `GET /api/items/{item_id}`: 부름 상세 내역 조회
-*   `POST /api/items/{item_id}/like`: 부름 관심(좋아요) 토글
-*   `GET /api/users/me/requests`: 내가 요청한 부름 목록 조회 (`/requests` 페이지용)
-*   `GET /api/users/me/progress`: 내가 지원하여 진행중인 부름 목록 조회 (`/progress` 페이지용)
-*   `PUT /api/items/{item_id}/status`: 부름 상태 변경 (진행중, 완료 등)
+### 4.4 채팅 (`routers/chat.py`)
 
-### 3.3. Town (동네생활) (`/town`, `/town/write`)
-*   `GET /api/town/posts`: 동네생활 게시글 목록 조회 (카테고리 탭 필터링 포함)
-*   `POST /api/town/posts`: 동네생활 게시글 작성
-*(참고: 현재 프론트엔드에 상세페이지 및 댓글 UI가 없으므로 해당 백엔드 기능은 제외)*
+| 메서드 | 경로 | 인증 필요 | 설명 |
+| :--- | :--- | :---: | :--- |
+| POST | `/api/chats/rooms` | O | 채팅방 생성 또는 기존 방 반환 |
+| GET | `/api/chats/rooms` | O | 내 채팅방 목록 조회 (최근 메시지 포함) |
+| GET | `/api/chats/rooms/{room_id}/messages` | O | 채팅방 메시지 히스토리 조회 |
+| POST | `/api/chats/rooms/{room_id}/upload` | O | 이미지·동영상 업로드 (최대 50MB) |
+| WS | `/ws/chat/{room_id}?token=<JWT>` | O | 실시간 채팅 (메시지 저장 + 브로드캐스트) |
 
-### 3.4. Chat (`/chat`)
-*   `GET /api/chats/rooms`: 내 채팅방 목록 및 최근 메시지 조회
-*   `WebSocket /ws/chat/{room_id}`: 실시간 채팅 송수신
+채팅방 생성 요청 body:
+- 부름글 채팅: `{ "buleum_id": <id> }` → 현재 유저가 헬퍼, 부름글 작성자가 요청자
+- 전문가 직접 채팅: `{ "helper_id": <user_id> }` → 현재 유저가 요청자
 
-### 3.5. Experts (`/experts`)
-*   `GET /api/experts`: 전문가 목록 조회 (카테고리 탭 필터링 포함)
+WebSocket 메시지 형식:
+```json
+{ "content": "메시지 내용", "message_type": "text" }
+{ "content": "", "message_type": "image", "file_url": "/uploads/chat/..." }
+```
 
-### 3.6. Notifications (`/notifications`)
-*   `GET /api/notifications`: 내 알림 목록 조회
+### 4.5 전문가 (`routers/others.py`)
 
-### 3.7. Payment (`/payment`)
-*   `POST /api/payments/deposit`: 안전결제 예치금 전송 및 저장
+| 메서드 | 경로 | 인증 필요 | 설명 |
+| :--- | :--- | :---: | :--- |
+| GET | `/api/experts` | | 전문가 목록 조회 (닉네임, 프로필 이미지 포함) |
 
-### 3.8. Review (`/review`)
-*   `POST /api/reviews`: 상대방 평가 별점 및 후기 작성 (작성 시 타겟 유저의 매너온도 업데이트 트리거)
+### 4.6 알림 (`routers/others.py`)
 
-### 3.9. Verification (`/verify`)
-*   `POST /api/verification`: 신원 인증용 자격증/신분증 서류 업로드 및 제출
+| 메서드 | 경로 | 인증 필요 | 설명 |
+| :--- | :--- | :---: | :--- |
+| GET | `/api/notifications` | O | 내 알림 목록 (최신순) |
+| PATCH | `/api/notifications/{id}/read` | O | 알림 읽음 처리 |
+
+알림 타입: `chat`, `accept`, `comment`, `review`
+
+### 4.7 결제 (`routers/others.py`)
+
+| 메서드 | 경로 | 인증 필요 | 설명 |
+| :--- | :--- | :---: | :--- |
+| POST | `/api/payments/deposit` | O | 안전결제 예치금 등록 → 부름 상태 `진행중` 변경 |
+| POST | `/api/payments/{payment_id}/confirm` | O | 구매 확정 → 상태 `지급완료`, 부름 상태 `완료` 변경 |
+| GET | `/api/payments/buleum/{buleum_id}` | O | 특정 부름글의 결제 정보 조회 |
+
+### 4.8 후기 (`routers/others.py`)
+
+| 메서드 | 경로 | 인증 필요 | 설명 |
+| :--- | :--- | :---: | :--- |
+| POST | `/api/reviews` | O | 후기 작성 → 대상자 매너온도 자동 업데이트 |
+
+매너온도 변경 공식: `manner_temperature += (rating - 3) * 0.1`
+
+### 4.9 신원 인증 (`routers/others.py`)
+
+| 메서드 | 경로 | 인증 필요 | 설명 |
+| :--- | :--- | :---: | :--- |
+| POST | `/api/verification` | O | 신원 인증 서류 제출 (심사중 → 승인됨/거절됨) |
+
+### 4.10 관리자 (`routers/admin.py`, prefix: `/api/admin`)
+
+| 메서드 | 경로 | 설명 |
+| :--- | :--- | :--- |
+| GET | `/api/admin/stats` | 대시보드 통계 (사용자/부름글/완료/전문가/결제 수) |
+| GET | `/api/admin/users` | 전체 사용자 목록 |
+| DELETE | `/api/admin/users/{user_id}` | 사용자 삭제 (관리자 계정 삭제 불가) |
+| GET | `/api/admin/items` | 전체 부름글 목록 |
+| DELETE | `/api/admin/items/{item_id}` | 부름글 삭제 |
+
+모든 관리자 엔드포인트는 `is_admin=True` 사용자만 접근 가능합니다.
+
+## 5. 파일 업로드
+
+- 일반 이미지: `backend/uploads/<uuid>_<filename>` → URL: `/uploads/<filename>`
+- 채팅 미디어: `backend/uploads/chat/<uuid>.<ext>` → URL: `/uploads/chat/<filename>`
+- 허용 이미지 타입: `image/jpeg`, `image/png`, `image/gif`, `image/webp`
+- 허용 동영상 타입: `video/mp4`, `video/quicktime`, `video/webm`
+- 최대 파일 크기: 50MB (채팅 미디어)
+
+## 6. 초기 관리자 계정
+
+서버 시작 시 자동 생성됩니다 (없을 경우):
+- **이메일:** `admin@gmail.com`
+- **비밀번호:** `pass123`
+- **is_admin:** `True`
+
+## 7. API 문서
+
+서버 실행 후 아래 URL에서 Swagger UI 확인 가능:
+- `http://localhost:8000/docs`
+- `http://localhost:8000/redoc`

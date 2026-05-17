@@ -1,80 +1,173 @@
-# 전체 프로젝트 가이드 (guide.md)
+# 프로젝트 설치 및 실행 가이드 (guide.md)
 
-본 문서는 당근마켓(Daangn) 클론 코딩 웹 애플리케이션의 개발 및 실행을 위한 종합 가이드라인입니다.
+최종 업데이트: 2026-05-17
 
-## 1. 프로젝트 개요 (Overview)
-*   **목표:** 당근마켓의 핵심 기능(중고거래, 동네생활, 실시간 채팅, 위치 기반 서비스)을 구현한 완전한 기능의 웹 애플리케이션 개발.
-*   **기술 스택:** React (Frontend) + FastAPI (Backend) + SQLite (Database)
+## 1. 프로젝트 개요
 
-## 2. 개발 환경 구축 (Environment Setup)
+**부름(Buleum)** — 효도 대행 및 심부름 서비스 플랫폼
 
-### 2.0. 원클릭 자동 실행 (추천)
-프로젝트 루트 디렉토리에서 다음 명령어 중 하나를 실행하면 패키지 설치 및 서버가 동시에 실행됩니다.
+| 항목 | 내용 |
+| :--- | :--- |
+| 프론트엔드 | React 19 + Vite 8 (포트 5173) |
+| 백엔드 | FastAPI + Python 3.9+ (포트 8000) |
+| 데이터베이스 | SQLite (`backend/buleum.db`) |
+| 실시간 | WebSocket |
 
-*   **방법 A (npm 이용):** `npm run dev`
-*   **방법 B (배치 파일 이용):** `start.bat` 파일 더블 클릭 또는 터미널에서 `./start.bat` 실행
+## 2. 필수 요구 사항
 
+| 도구 | 권장 버전 |
+| :--- | :--- |
+| Node.js | 18 이상 |
+| Python | 3.9 이상 |
+| Git | 최신 버전 |
 
-### 2.1. 필수 요구사항
-*   Node.js (v18 이상)
-*   Python (v3.10 이상)
-*   Git
+## 3. 설치 및 실행
 
+### 방법 A. Windows 원클릭 실행 (권장)
 
-### 2.2. 백엔드 설정 (Backend Setup)
-1. `backend` 디렉토리로 이동합니다.
-2. 가상환경을 생성하고 활성화합니다.
-   ```bash
-   python -m venv venv
-   # Windows
-   .\venv\Scripts\activate
-   # macOS/Linux
-   source venv/bin/activate
-   ```
-3. 필요한 패키지를 설치합니다.
-   ```bash
-   pip install fastapi uvicorn sqlalchemy pydantic passlib[bcrypt] python-jose[cryptography] python-multipart
-   ```
-4. 서버를 실행합니다.
-   ```bash
-   uvicorn main:app --reload
-   ```
+프로젝트 루트에서 `start.bat`을 실행합니다.
 
-### 2.3. 프론트엔드 설정 (Frontend Setup)
-1. `frontend` 디렉토리로 이동합니다.
-2. 패키지를 설치합니다.
-   ```bash
-   npm install
-   ```
-3. 개발 서버를 실행합니다.
-   ```bash
-   npm run dev
-   ```
+```bat
+start.bat
+```
 
-## 3. 개발 단계별 로드맵 (Roadmap)
+자동으로 처리되는 작업:
+1. 백엔드 `venv` 가상환경 생성 및 패키지 설치
+2. 프론트엔드 `node_modules` 설치
+3. 백엔드 서버 (포트 8000) 실행
+4. 프론트엔드 서버 (포트 5173) 실행
+5. 브라우저 자동 열기 (`http://localhost:5173`)
 
-### Phase 1: 기반 마련 (1주차)
-*   프로젝트 초기화 (React & FastAPI)
-*   SQLite 데이터베이스 연동 및 기본 스키마 생성
-*   기본 UI/UX 레이아웃 (Header, Footer, Navigation) 구현
+### 방법 B. npm 동시 실행
 
-### Phase 2: 사용자 및 위치 (2주차)
-*   JWT 기반 회원가입/로그인 구현
-*   Geolocation API를 활용한 동네 설정 및 인증 기능
+루트 디렉토리에서 실행합니다.
 
-### Phase 3: 핵심 비즈니스 로직 (3~4주차)
-*   **중고거래:** 상품 등록(이미지 업로드), 조회, 수정, 삭제 기능
-*   **동네생활:** 게시글 및 댓글 작성 기능
-*   **찜하기:** 관심 상품 등록 기능
+```bash
+# 최초 실행 시 패키지 설치
+npm install
+npm run install:frontend
 
-### Phase 4: 실시간 소통 (5주차)
-*   WebSocket을 활용한 1:1 실시간 채팅 기능 구현
-*   채팅방 목록 및 메시지 히스토리 관리
+# Windows 환경에서 백엔드 의존성 설치
+npm run install:backend
 
-### Phase 5: 최적화 및 폴리싱 (6주차)
-*   Rich Aesthetics 적용 (애니메이션, 디자인 완성도 향상)
-*   버그 수정 및 성능 최적화
+# 프론트엔드 + 백엔드 동시 실행
+npm run dev
+```
 
-## 4. 품질 관리 (Quality Assurance)
-*   **API 테스트:** FastAPI의 `/docs` (Swagger UI)를 활용하여 엔드포인트 동작 확인
-*   **크로스 브라우징:** Chrome, Safari, Edge 등 주요 브라우저에서의 반응형 레이아웃 확인
+> `concurrently`를 사용해 두 서버를 동시에 시작합니다.
+> Windows 환경에서는 `venv\Scripts\uvicorn`을 사용하므로 Linux/macOS에서는 방법 C를 권장합니다.
+
+### 방법 C. 수동 개별 실행 (Linux / macOS)
+
+**백엔드 실행:**
+
+```bash
+cd backend
+
+# 최초 실행 시
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# 이후 실행
+source venv/bin/activate
+uvicorn main:app --reload --port 8000
+```
+
+**프론트엔드 실행 (새 터미널):**
+
+```bash
+cd frontend
+
+# 최초 실행 시
+npm install
+
+# 이후 실행
+npm run dev
+```
+
+## 4. 접속 URL
+
+| 서비스 | URL |
+| :--- | :--- |
+| 프론트엔드 | `http://localhost:5173` |
+| 백엔드 API | `http://localhost:8000` |
+| Swagger UI | `http://localhost:8000/docs` |
+| ReDoc | `http://localhost:8000/redoc` |
+
+## 5. 초기 관리자 계정
+
+서버 첫 시작 시 자동 생성됩니다.
+
+| 항목 | 값 |
+| :--- | :--- |
+| 이메일 | `admin@gmail.com` |
+| 비밀번호 | `pass123` |
+| 관리자 페이지 | `http://localhost:5173/admin` |
+
+## 6. 주요 패키지 목록
+
+### 백엔드 (`backend/requirements.txt`)
+
+```
+fastapi>=0.100.0
+uvicorn>=0.22.0
+sqlalchemy>=2.0.0
+pydantic[email]>=2.0.0
+bcrypt>=4.0.1
+python-jose[cryptography]>=3.3.0
+python-multipart>=0.0.6
+email-validator>=2.0.0
+websockets>=11.0
+```
+
+### 프론트엔드 (`frontend/package.json`)
+
+```json
+{
+  "dependencies": {
+    "axios": "^1.15.2",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-router-dom": "^7.14.2"
+  }
+}
+```
+
+## 7. 파일 업로드 경로
+
+업로드된 파일은 `backend/uploads/`에 저장됩니다.
+
+```
+backend/uploads/
+├── <uuid>_<filename>     # 부름글 이미지
+└── chat/
+    └── <uuid>.<ext>      # 채팅 이미지·동영상
+```
+
+서버가 `/uploads` 경로로 정적 파일을 서빙합니다.
+
+## 8. 환경별 주의 사항
+
+- **CORS:** 현재 `allow_origins=["*"]` 설정으로 모든 출처 허용 (개발 환경 전용)
+- **JWT SECRET_KEY:** `supersecretkey_buleum_project` → 프로덕션 배포 시 환경변수로 교체 필요
+- **SQLite:** 단일 파일 DB로 동시 쓰기 부하에 취약 — 대규모 서비스 전환 시 PostgreSQL 마이그레이션 고려
+- **파일 저장:** 로컬 디스크 저장 방식 — 클라우드 배포 시 S3 등 외부 스토리지 연동 필요
+
+## 9. 구현 완료 기능 요약
+
+| 기능 | 상태 |
+| :--- | :--- |
+| 회원가입 / 로그인 (JWT) | 완료 |
+| 부름글 CRUD + 이미지 업로드 | 완료 |
+| 부름글 관심(좋아요) 토글 | 완료 |
+| 동네생활 게시글 작성 | 완료 |
+| 실시간 채팅 (WebSocket) | 완료 |
+| 채팅 이미지·동영상 첨부 (50MB) | 완료 |
+| 전문가 목록 및 직접 채팅 연결 | 완료 |
+| 알림 (채팅·결제·후기) | 완료 |
+| 안전결제 (예치 → 구매 확정) | 완료 |
+| 후기 작성 + 매너온도 자동 반영 | 완료 |
+| 신원 인증 서류 제출 | 완료 |
+| 관리자 대시보드 | 완료 |
+| GitHub Actions CI/CD 자동 배포 | 완료 |

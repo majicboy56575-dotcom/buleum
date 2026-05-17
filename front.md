@@ -1,89 +1,134 @@
-# 프론트엔드 명세서 (front.md)
+# 프론트엔드 현황 문서 (front.md)
 
-본 문서는 당근마켓(Daangn) 클론 코딩 웹 애플리케이션의 프론트엔드 개발을 위한 명세서입니다.
+최종 업데이트: 2026-05-17
 
-## 1. 기술 스택 (Technology Stack)
-*   **Core:** React (v18+)
-*   **Build Tool:** Vite
-*   **Styling:** Vanilla CSS (모던 CSS 기능 활용, CSS Variables, Flexbox, Grid)
-    *   *주의:* TailwindCSS는 사용하지 않으며, 프리미엄 디자인 구현을 위해 커스텀 스타일링을 적용합니다.
-*   **State Management:** React Context API (전역 상태: 사용자 인증, 현재 위치 등)
-*   **Routing:** React Router DOM (v6)
-*   **HTTP Client:** Axios 또는 Fetch API
-*   **Real-time:** WebSocket (채팅 기능용)
+## 1. 기술 스택
 
-## 2. 프로젝트 구조 (Project Structure)
+| 항목 | 버전 |
+| :--- | :--- |
+| React | 19.2.5 |
+| React Router DOM | 7.14.2 |
+| Axios | 1.15.2 |
+| Vite | 8.0.10 |
+| ESLint | 10.x |
+
+## 2. 실제 프로젝트 구조
+
 ```text
 frontend/
 ├── public/
-│   └── assets/          # 정적 이미지 및 아이콘
 ├── src/
-│   ├── components/      # 재사용 가능한 공통 컴포넌트
-│   │   ├── common/      # Button, Input, Modal, Loader 등
-│   │   ├── layout/      # Header, Footer, Sidebar 등
-│   │   └── item/        # 상품 카드 등 도메인별 컴포넌트
-│   ├── contexts/        # 전역 상태 관리 (AuthContext, LocationContext)
-│   ├── hooks/           # 커스텀 훅 (useAuth, useSocket 등)
-│   ├── pages/           # 페이지 컴포넌트
-│   ├── services/        # API 통신 모듈 (api.js)
-│   ├── styles/          # 전역 스타일 및 테마 (index.css, variables.css)
-│   ├── utils/           # 유틸리티 함수 (날짜 변환, 가격 포맷 등)
-│   ├── App.jsx
+│   ├── components/
+│   │   └── layout/
+│   │       ├── Header.jsx / Header.css
+│   │       └── Footer.jsx / Footer.css
+│   ├── pages/                  # 구현 완료된 페이지 컴포넌트
+│   │   ├── Home.jsx / Home.css
+│   │   ├── Items.jsx / Items.css
+│   │   ├── ItemDetail.jsx / ItemDetail.css
+│   │   ├── ItemWrite.jsx / ItemWrite.css
+│   │   ├── Town.jsx / Town.css
+│   │   ├── TownWrite.jsx
+│   │   ├── Experts.jsx / Experts.css
+│   │   ├── Chat.jsx / Chat.css
+│   │   ├── Login.jsx
+│   │   ├── Signup.jsx
+│   │   ├── Profile.jsx / Profile.css
+│   │   ├── LikedItems.jsx
+│   │   ├── Requests.jsx / Requests.css
+│   │   ├── Progress.jsx
+│   │   ├── Notifications.jsx / Notifications.css
+│   │   ├── PaymentPage.jsx / PaymentPage.css
+│   │   ├── Payment.jsx / Payment.css
+│   │   ├── Review.jsx / Review.css
+│   │   ├── Verification.jsx / Verification.css
+│   │   └── AdminDashboard.jsx / AdminDashboard.css
+│   ├── styles/
+│   │   ├── index.css           # 전역 스타일
+│   │   └── variables.css       # CSS 변수 (색상, 간격 등)
+│   ├── App.jsx                 # 라우팅 설정
 │   └── main.jsx
+├── dist/                       # 빌드 결과물
 ├── index.html
 ├── package.json
 └── vite.config.js
 ```
 
-## 3. 핵심 디자인 시스템 (Design System)
-*   **주요 색상 (Brand Colors):**
-    *   당근 오렌지: `#FF7E36`
-    *   서브 오렌지 (Hover): `#E96516`
-    *   배경색: `#FBF7F2` (Light), `#121212` (Dark - 선택 사항)
-*   **타이포그래피:**
-    *   기본 폰트: `Pretendard`, `Noto Sans KR`
-*   **Rich Aesthetics 적용:**
-    *   부드러운 그림자 (Soft Shadows) 및 둥근 모서리 (Border Radius: 8px~12px)
-    *   인터랙티브 요소에 마이크로 애니메이션(Hover, Active 상태 변화) 적용
+## 3. 라우팅 구조 (App.jsx 기준)
 
-## 4. 주요 페이지 및 기능 (Pages & Features)
+| 경로 | 컴포넌트 | 설명 |
+| :--- | :--- | :--- |
+| `/` | Home | 메인 홈 |
+| `/items` | Items | 부름 목록 |
+| `/items/write` | ItemWrite | 부름 작성 |
+| `/items/:id` | ItemDetail | 부름 상세 |
+| `/town` | Town | 동네생활 목록 |
+| `/town/write` | TownWrite | 동네생활 작성 |
+| `/experts` | Experts | 전문가 목록 |
+| `/chat` | Chat | 채팅방 목록 및 실시간 채팅 |
+| `/login` | Login | 로그인 |
+| `/signup` | Signup | 회원가입 |
+| `/profile` | Profile | 마이페이지 |
+| `/profile/liked` | LikedItems | 관심 목록 |
+| `/requests` | Requests | 내가 요청한 부름 목록 |
+| `/progress` | Progress | 내가 수행 중인 부름 목록 |
+| `/notifications` | Notifications | 알림 목록 |
+| `/payments/deposit/:buleumId` | PaymentPage | 안전결제 |
+| `/review` | Review | 후기 작성 |
+| `/verify` | Verification | 신원 인증 서류 제출 |
+| `/admin` | AdminDashboard | 관리자 대시보드 |
+| `*` | Home | 404 폴백 |
 
-### 4.1. 메인 페이지 (Home Page) - `/`
-*   **기능:**
-    *   히어로 섹션: 서비스 소개 및 검색창
-    *   인기 매물 리스트 (그리드 레이아웃)
-    *   서비스 바로가기 (중고거래, 동네생활, 알바 등)
+## 4. 구현된 주요 기능
 
-### 4.2. 중고거래 (Used Trading) - `/items`
-*   **목록 페이지 (`/items`):**
-    *   동네별, 카테고리별 필터링 기능
-    *   무한 스크롤(Infinite Scroll) 또는 더보기 버튼을 통한 목록 조회
-*   **상세 페이지 (`/items/:id`):**
-    *   상품 이미지 슬라이더 (Carousel)
-    *   판매자 정보 (매너온도, 닉네임)
-    *   상품 상태 (판매중, 예약중, 판매완료) 및 가격
-    *   관심 버튼 (찜하기) 및 '채팅하기' 버튼
-*   **글쓰기/수정 페이지 (`/items/write`, `/items/edit/:id`):**
-    *   다중 이미지 업로드 및 미리보기 (최대 10장)
-    *   가격 제안 가능 여부 체크박스
+### 4.1 인증
+- 이메일/비밀번호 회원가입 및 로그인
+- JWT 토큰 localStorage 저장 및 Axios 헤더 자동 첨부
 
-### 4.3. 동네생활 (Neighborhood Life) - `/town`
-*   **기능:**
-    *   동네 소통 게시판 (질문, 맛집, 일상 등 카테고리)
-    *   게시글 작성 및 댓글/답글 기능
-    *   공감(좋아요) 및 조회수 표시
+### 4.2 부름(Buleum) 거래
+- 부름 목록 조회 (검색어, 지역 필터)
+- 부름 작성 (이미지 업로드 포함)
+- 부름 상세 조회 및 관심(찜) 토글
+- 상태 변경 (대기중 → 진행중 → 완료)
+- 내 요청 목록 (`/requests`), 내 수행 목록 (`/progress`)
 
-### 4.4. 실시간 채팅 (Chat) - `/chat`
-*   **기능:**
-    *   채팅방 목록: 최근 메시지 및 읽지 않은 메시지 수 표시
-    *   채팅창: WebSocket을 통한 실시간 메시지 전송 및 수신
-    *   거래 약속 잡기 기능 (선택 사항)
+### 4.3 동네생활
+- 게시글 목록 (카테고리 탭 필터링)
+- 게시글 작성 (이미지 업로드 포함)
 
-### 4.5. 마이페이지 (My Page) - `/profile`
-*   **기능:**
-    *   내 프로필 수정 (닉네임, 프로필 사진)
-    *   판매 내역, 구매 내역, 관심 목록 조회
+### 4.4 실시간 채팅
+- 채팅방 목록 조회 (최근 메시지 표시)
+- WebSocket 실시간 메시지 송수신 (`/ws/chat/{room_id}?token=...`)
+- 이미지·동영상 파일 첨부 (최대 50MB)
 
-## 5. 위치 기반 서비스 (GPS)
-*   사용자의 브라우저 Geolocation API를 활용하여 현재 위치 좌표 획득
-*   백엔드 API를 통해 현재 위치 기반의 '동네' 설정 및 인증 처리
+### 4.5 전문가
+- 전문가 목록 조회 (카테고리 필터링)
+- 전문가와 직접 채팅 연결
+
+### 4.6 마이페이지
+- 프로필 정보 조회 및 수정 (닉네임, 동네, 프로필 이미지)
+- 관심 목록 조회
+
+### 4.7 알림
+- 채팅·결제·후기 관련 알림 조회
+- 알림 읽음 처리
+
+### 4.8 안전결제
+- 예치금 전송 (결제 방법 선택)
+- 구매 확정 (지급 완료 처리)
+
+### 4.9 후기 및 신원 인증
+- 별점 및 후기 작성 → 상대방 매너온도 자동 반영
+- 신분증/자격증 서류 제출
+
+### 4.10 관리자 대시보드
+- 통계 요약 (총 사용자, 총 부름글, 완료 건수, 전문가 수, 결제 수)
+- 전체 사용자 조회 및 삭제
+- 전체 부름글 조회 및 삭제
+
+## 5. API 통신
+
+- 기본 URL: `http://localhost:8000`
+- 인증 헤더: `Authorization: Bearer <JWT_TOKEN>`
+- 파일 업로드: `multipart/form-data`
+- WebSocket: `ws://localhost:8000/ws/chat/{room_id}?token=<JWT_TOKEN>`
