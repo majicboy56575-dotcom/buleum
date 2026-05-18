@@ -1,6 +1,6 @@
 # 백엔드 현황 문서 (backend.md)
 
-최종 업데이트: 2026-05-17
+최종 업데이트: 2026-05-18
 
 ## 1. 기술 스택
 
@@ -95,13 +95,19 @@ WebSocket 메시지 형식:
 { "content": "", "message_type": "image", "file_url": "/uploads/chat/..." }
 ```
 
-### 4.5 전문가 (`routers/others.py`)
+### 4.5 기타 (`routers/others.py`)
+
+| 메서드 | 경로 | 인증 필요 | 설명 |
+| :--- | :--- | :---: | :--- |
+| GET | `/api/test` | | API 정상 동작 확인 |
+
+### 4.6 전문가 (`routers/others.py`)
 
 | 메서드 | 경로 | 인증 필요 | 설명 |
 | :--- | :--- | :---: | :--- |
 | GET | `/api/experts` | | 전문가 목록 조회 (닉네임, 프로필 이미지 포함) |
 
-### 4.6 알림 (`routers/others.py`)
+### 4.7 알림 (`routers/others.py`)
 
 | 메서드 | 경로 | 인증 필요 | 설명 |
 | :--- | :--- | :---: | :--- |
@@ -110,7 +116,7 @@ WebSocket 메시지 형식:
 
 알림 타입: `chat`, `accept`, `comment`, `review`
 
-### 4.7 결제 (`routers/others.py`)
+### 4.8 결제 (`routers/others.py`)
 
 | 메서드 | 경로 | 인증 필요 | 설명 |
 | :--- | :--- | :---: | :--- |
@@ -118,7 +124,7 @@ WebSocket 메시지 형식:
 | POST | `/api/payments/{payment_id}/confirm` | O | 구매 확정 → 상태 `지급완료`, 부름 상태 `완료` 변경 |
 | GET | `/api/payments/buleum/{buleum_id}` | O | 특정 부름글의 결제 정보 조회 |
 
-### 4.8 후기 (`routers/others.py`)
+### 4.9 후기 (`routers/others.py`)
 
 | 메서드 | 경로 | 인증 필요 | 설명 |
 | :--- | :--- | :---: | :--- |
@@ -126,13 +132,13 @@ WebSocket 메시지 형식:
 
 매너온도 변경 공식: `manner_temperature += (rating - 3) * 0.1`
 
-### 4.9 신원 인증 (`routers/others.py`)
+### 4.10 신원 인증 (`routers/others.py`)
 
 | 메서드 | 경로 | 인증 필요 | 설명 |
 | :--- | :--- | :---: | :--- |
 | POST | `/api/verification` | O | 신원 인증 서류 제출 (심사중 → 승인됨/거절됨) |
 
-### 4.10 관리자 (`routers/admin.py`, prefix: `/api/admin`)
+### 4.11 관리자 (`routers/admin.py`, prefix: `/api/admin`)
 
 | 메서드 | 경로 | 설명 |
 | :--- | :--- | :--- |

@@ -1,6 +1,6 @@
 # 프로젝트 설치 및 실행 가이드 (guide.md)
 
-최종 업데이트: 2026-05-17
+최종 업데이트: 2026-05-18
 
 ## 1. 프로젝트 개요
 
@@ -154,7 +154,33 @@ backend/uploads/
 - **SQLite:** 단일 파일 DB로 동시 쓰기 부하에 취약 — 대규모 서비스 전환 시 PostgreSQL 마이그레이션 고려
 - **파일 저장:** 로컬 디스크 저장 방식 — 클라우드 배포 시 S3 등 외부 스토리지 연동 필요
 
-## 9. 구현 완료 기능 요약
+## 9. GitHub Actions CI/CD 자동 배포
+
+`.github/workflows/deploy.yml`에 정의된 워크플로우가 `main` 브랜치에 푸시될 때마다 EC2 서버에 자동으로 배포됩니다.
+
+### 배포 흐름
+
+```
+git push → main 브랜치 감지 → EC2 SSH 접속 → git pull → npm install → npm run build
+```
+
+### 필수 GitHub Secrets
+
+| 시크릿 키 | 설명 |
+| :--- | :--- |
+| `EC2_HOST` | EC2 인스턴스의 퍼블릭 IP 또는 도메인 |
+| `EC2_SSH_KEY` | EC2 접속용 SSH 프라이빗 키 (PEM 전체 내용) |
+
+### 배포 시 실행되는 작업
+
+1. EC2 서버에 SSH 접속 (`appleboy/ssh-action@v1.0.3`)
+2. `/home/ec2-user/buleum`에서 `git pull origin main`
+3. `frontend/` 디렉토리에서 `npm install` 및 `npm run build`
+4. 빌드 산출물(`frontend/dist/`)은 백엔드 `/uploads` 정적 서빙과 별도로 운용
+
+> **주의:** 백엔드 재시작은 자동화되어 있지 않습니다. 백엔드 코드 변경 시 EC2에서 수동으로 uvicorn 프로세스를 재시작해야 합니다.
+
+## 10. 구현 완료 기능 요약
 
 | 기능 | 상태 |
 | :--- | :--- |

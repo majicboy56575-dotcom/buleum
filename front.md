@@ -1,6 +1,6 @@
 # 프론트엔드 현황 문서 (front.md)
 
-최종 업데이트: 2026-05-17
+최종 업데이트: 2026-05-18
 
 ## 1. 기술 스택
 
@@ -17,7 +17,12 @@
 ```text
 frontend/
 ├── public/
+│   ├── favicon.svg
+│   ├── hero-image.png
+│   └── icons.svg
 ├── src/
+│   ├── api/
+│   │   └── axios.js            # Axios 인스턴스 설정 (baseURL, 인터셉터)
 │   ├── components/
 │   │   └── layout/
 │   │       ├── Header.jsx / Header.css
@@ -33,6 +38,7 @@ frontend/
 │   │   ├── Chat.jsx / Chat.css
 │   │   ├── Login.jsx
 │   │   ├── Signup.jsx
+│   │   ├── Auth.css            # 로그인·회원가입 공용 스타일
 │   │   ├── Profile.jsx / Profile.css
 │   │   ├── LikedItems.jsx
 │   │   ├── Requests.jsx / Requests.css
@@ -132,3 +138,11 @@ frontend/
 - 인증 헤더: `Authorization: Bearer <JWT_TOKEN>`
 - 파일 업로드: `multipart/form-data`
 - WebSocket: `ws://localhost:8000/ws/chat/{room_id}?token=<JWT_TOKEN>`
+
+### 5.1 Axios 설정 (`src/api/axios.js`)
+
+`axios.create()`로 baseURL을 `http://localhost:8000`으로 설정하고, 요청 인터셉터에서 `localStorage`에 저장된 JWT 토큰을 `Authorization` 헤더에 자동 첨부합니다.
+
+## 6. 빌드 산출물
+
+`npm run build` 실행 시 `frontend/dist/`에 빌드 결과물이 생성되며, GitHub Actions CI/CD를 통해 EC2 서버에서 자동으로 빌드됩니다.
