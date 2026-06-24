@@ -215,3 +215,13 @@ class VerificationResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+# ========================
+# Email Verification Code Schemas
+# ========================
+class SendVerificationCode(BaseModel):
+    email: EmailStr
+
+class VerifyCode(BaseModel):
+    email: EmailStr
+    code: str

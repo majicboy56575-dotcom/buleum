@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()  # .env 파일에서 환경변수 로드
+
 from fastapi import FastAPI, Depends, WebSocket, WebSocketDisconnect, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles

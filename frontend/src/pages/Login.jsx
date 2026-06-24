@@ -6,10 +6,13 @@ import './Auth.css';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showVerifyNotice, setShowVerifyNotice] = useState(false);
+  const [resending, setResending] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setShowVerifyNotice(false);
     try {
       const response = await api.post('/auth/login', {
         email,
@@ -27,8 +30,17 @@ const Login = () => {
       alert(`${meResponse.data.nickname}님, 환영합니다!`);
       navigate('/');
     } catch (error) {
-      alert(error.response?.data?.detail || '로그인 중 오류가 발생했습니다.');
+      const detail = error.response?.data?.detail;
+      if (detail === 'EMAIL_NOT_VERIFIED') {
+        setShowVerifyNotice(true);
+      } else {
+        alert(detail || '로그인 중 오류가 발생했습니다.');
+      }
     }
+  };
+
+  const handleResendVerification = async () => {
+    navigate('/signup');
   };
 
   return (
@@ -36,6 +48,23 @@ const Login = () => {
       <div className="auth-container">
         <h1 className="auth-title">부름 로그인</h1>
         <p className="auth-subtitle">부름 서비스에 오신 것을 환영합니다.</p>
+
+        {showVerifyNotice && (
+          <div className="verify-notice">
+            <div className="verify-notice-icon">✉️</div>
+            <p className="verify-notice-title">이메일 인증이 필요합니다</p>
+            <p className="verify-notice-text">
+              회원가입 시 이메일 인증을 완료해주세요. 회원가입 페이지에서 인증번호를 받을 수 있습니다.
+            </p>
+            <button 
+              className="verify-resend-btn"
+              onClick={handleResendVerification}
+              disabled={resending}
+            >
+              {resending ? '처리 중...' : '회원가입 페이지로 이동'}
+            </button>
+          </div>
+        )}
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">

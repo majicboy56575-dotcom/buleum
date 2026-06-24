@@ -21,6 +21,7 @@ import LikedItems from './pages/LikedItems';
 import Review from './pages/Review';
 import Verification from './pages/Verification';
 import AdminDashboard from './pages/AdminDashboard';
+import CustomerCenter from './pages/CustomerCenter';
 import './styles/index.css';
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
             <Route path="/review" element={<Review />} />
             <Route path="/verify" element={<Verification />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/customer-center" element={<CustomerCenter />} />
             {/* Fallback for other routes */}
             <Route path="*" element={<Home />} />
           </Routes>
