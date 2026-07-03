@@ -40,7 +40,7 @@ const Progress = () => {
             {progressItems.map(item => (
               <div key={item.id} className="list-card">
                 <div className="list-image-wrapper">
-                  <img src={item.image_url ? `${BACKEND_URL}${item.image_url}` : 'https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?w=500'} alt={item.title} />
+                  {item.image_url && <img src={`${BACKEND_URL}${item.image_url}`} alt={item.title} />}
                 </div>
                 <div className="list-content">
                   <div className="list-header">

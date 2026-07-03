@@ -3,10 +3,18 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from database import SessionLocal
 import models
+import auth
 
-# 대전 17개, 천안 1개, 청주 1개, 안산 1개로 재구성한 20개 심부름 데이터
+# 20개의 다양한 닉네임
+nicknames = [
+    "효도왕자", "따뜻한손길", "엄마사랑꾼", "든든한아들", "착한이웃",
+    "동네형아", "마음돌봄이", "달려가는딸", "다정한봄", "해피헬퍼",
+    "대전도우미", "엄마미소", "효자손자", "따뜻한차한잔", "두정동히어로",
+    "사랑의일꾼", "청춘봉사자", "늘곁에", "이웃사촌", "봉사하는민수"
+]
+
+# 대전 17개, 천안 1개, 청주 1개, 안산 1개
 dummy_contents = [
-    # --- 대전 지역 (17개) ---
     {
         "title": "부모님 스마트폰 사진 백업 및 클라우드 동기화 정리",
         "description": "부모님 스마트폰 용량이 꽉 차서 사진 촬영이 안 됩니다. 외장 하드 및 네이버 MYBOX 클라우드로 여태 찍으신 자식, 손주 사진들을 안전하게 옮겨서 백업해주실 분 구합니다.",
@@ -109,8 +117,6 @@ dummy_contents = [
         "location": "대전시 서구 월평동",
         "price": 35000
     },
-
-    # --- 천안, 청주, 안산 (각 1개, 총 3개) ---
     {
         "title": "천안 어머니 댁 장보기 보조 및 쌀 포대 옮기기",
         "description": "무릎 관절이 안 좋으신 천안의 어머니 장보기를 지원합니다. 마트에서 무거운 쌀포대(20kg)와 생수 상자 등을 카트에 싣고 차량에 실어 자택 주방까지 안전하게 배달해주실 분 구합니다.",
@@ -134,29 +140,37 @@ dummy_contents = [
 def create_dummies():
     db: Session = SessionLocal()
     try:
-        # 1. 기존 더미 헬퍼 사용자 확인
-        dummy_user = db.query(models.User).filter(models.User.email == "dummy_helper@buleum.com").first()
-        if not dummy_user:
-            dummy_user = models.User(
-                email="dummy_helper@buleum.com",
-                password_hash="pbkdf2:sha256:260000$encryptedhash",
-                nickname="효도도우미",
-                location="대전시 서구",
-                manner_temperature=37.2,
+        # 1. 기존 더미 사용자들(is_simulated=True)의 부름 글 삭제
+        simulated_users = db.query(models.User).filter(models.User.is_simulated == True).all()
+        for su in simulated_users:
+            db.query(models.Buleum).filter(models.Buleum.user_id == su.id).delete()
+        # 기존 더미 사용자 삭제
+        db.query(models.User).filter(models.User.is_simulated == True).delete()
+        db.commit()
+        print(f"기존 더미 사용자 및 부름 데이터 삭제 완료")
+
+        # 2. 20개의 더미 사용자 생성 (각각 다른 닉네임)
+        dummy_users = []
+        for idx, nick in enumerate(nicknames):
+            user = models.User(
+                email=f"dummy{idx+1}@buleum.com",
+                password_hash=auth.get_password_hash("dummy1234"),
+                nickname=nick,
+                location=dummy_contents[idx]["location"],
+                manner_temperature=round(random.uniform(36.0, 38.5), 1),
                 is_verified=True,
                 is_admin=False,
                 is_simulated=True
             )
-            db.add(dummy_user)
-            db.commit()
-            db.refresh(dummy_user)
-            print(f"더미 사용자 '{dummy_user.nickname}' 생성 완료")
-        else:
-            # 기존 더미 사용자가 작성한 부름 글들 제거 (중복 유입 방지)
-            deleted_count = db.query(models.Buleum).filter(models.Buleum.user_id == dummy_user.id).delete()
-            print(f"기존 더미 부름 데이터 {deleted_count}개 삭제 완료")
+            db.add(user)
+            dummy_users.append(user)
         
-        # 2. 신규 대전 중심 20개 더미 데이터 등록
+        db.commit()
+        for u in dummy_users:
+            db.refresh(u)
+        print(f"더미 사용자 {len(dummy_users)}명 생성 완료")
+
+        # 3. 각 사용자에게 1개씩 부름 게시글 등록 (총 20개)
         now = datetime.utcnow()
         for idx, item in enumerate(dummy_contents):
             random_days_ago = random.randint(0, 14)
@@ -167,7 +181,7 @@ def create_dummies():
             item_status = random.choice(status_list)
             
             buleum_post = models.Buleum(
-                user_id=dummy_user.id,
+                user_id=dummy_users[idx].id,
                 title=item["title"],
                 price=item["price"],
                 description=item["description"],
@@ -181,11 +195,13 @@ def create_dummies():
             db.add(buleum_post)
         
         db.commit()
-        print("성공적으로 대전 위주의 20개 더미 부름 데이터를 데이터베이스에 업데이트했습니다!")
+        print("20개 더미 부름 데이터를 각각 다른 닉네임의 사용자로 생성 완료!")
         
     except Exception as e:
         db.rollback()
-        print(f"더미 데이터 추가 중 에러 발생: {e}")
+        print(f"에러 발생: {e}")
+        import traceback
+        traceback.print_exc()
     finally:
         db.close()
 

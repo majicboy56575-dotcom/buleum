@@ -90,14 +90,13 @@ const Home = () => {
             {items.slice(0, 4).map((item) => (
               <Link to={`/items/${item.id}`} key={item.id} className="item-card">
                 <div className="item-image-wrapper">
-                  <img 
-                    src={item.image_url 
-                      ? (item.image_url.startsWith('http') ? item.image_url : `${BACKEND_URL}${item.image_url}`) 
-                      : 'https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?w=500'
-                    } 
-                    alt={item.title} 
-                    className="item-card-image" 
-                  />
+                  {item.image_url && (
+                    <img 
+                      src={item.image_url.startsWith('http') ? item.image_url : `${BACKEND_URL}${item.image_url}`}
+                      alt={item.title} 
+                      className="item-card-image" 
+                    />
+                  )}
                 </div>
                 <div className="item-card-content">
                   <h3 className="item-card-title">{item.title}</h3>

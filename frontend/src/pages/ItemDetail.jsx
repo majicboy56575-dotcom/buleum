@@ -106,16 +106,15 @@ const ItemDetail = () => {
   return (
     <div className="item-detail-page">
       <div className="detail-container">
-        <div className="image-slider">
-          <img 
-            src={item.image_url 
-              ? (item.image_url.startsWith('http') ? item.image_url : `${BACKEND_URL}${item.image_url}`)
-              : 'https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?w=800'
-            } 
-            alt={item.title} 
-            className="detail-image" 
-          />
-        </div>
+        {item.image_url && (
+          <div className="image-slider">
+            <img 
+              src={item.image_url.startsWith('http') ? item.image_url : `${BACKEND_URL}${item.image_url}`}
+              alt={item.title} 
+              className="detail-image" 
+            />
+          </div>
+        )}
 
         <div className="seller-profile">
           <div className="seller-avatar">
@@ -163,7 +162,7 @@ const ItemDetail = () => {
             {allItems.filter(i => i.id !== parseInt(id)).slice(0, 6).map((i) => (
               <Link to={`/items/${i.id}`} key={i.id} className="item-card">
                 <div className="item-image-wrapper">
-                  <img src={i.image_url ? `${BACKEND_URL}${i.image_url}` : 'https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?w=500'} alt={i.title} className="item-card-image" />
+                  {i.image_url && <img src={`${BACKEND_URL}${i.image_url}`} alt={i.title} className="item-card-image" />}
                 </div>
                 <div className="item-card-content">
                   <h3 className="item-card-title">{i.title}</h3>

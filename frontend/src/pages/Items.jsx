@@ -187,9 +187,11 @@ const Items = () => {
             <div className="items-grid">
               {filteredItems.map((item) => (
                 <Link to={`/items/${item.id}`} key={item.id} className="item-list-card">
-                  <div className="item-list-image-wrapper">
-                    <img src={item.image_url ? `${BACKEND_URL}${item.image_url}` : 'https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?w=500'} alt={item.title} className="item-card-image" />
-                  </div>
+                  {item.image_url && (
+                    <div className="item-list-image-wrapper">
+                      <img src={`${BACKEND_URL}${item.image_url}`} alt={item.title} className="item-card-image" />
+                    </div>
+                  )}
                   <div className="item-list-content">
                     <h3 className="item-list-title">{item.title}</h3>
                     <div className="item-list-price">{item.price.toLocaleString()}원</div>

@@ -50,7 +50,7 @@ const Requests = () => {
             {requests.map(req => (
               <div key={req.id} className="list-card">
                 <div className="list-image-wrapper">
-                  <img src={req.image_url ? `${BACKEND_URL}${req.image_url}` : 'https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?w=500'} alt={req.title} />
+                  {req.image_url && <img src={`${BACKEND_URL}${req.image_url}`} alt={req.title} />}
                 </div>
                 <div className="list-content">
                   <div className="list-header">
