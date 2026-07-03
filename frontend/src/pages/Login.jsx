@@ -95,6 +95,9 @@ const Login = () => {
         </form>
 
         <div className="auth-footer">
+          <div style={{ marginBottom: '12px' }}>
+            <Link to="/forgot-password">비밀번호를 잊으셨나요?</Link>
+          </div>
           아직 계정이 없으신가요? <Link to="/signup">회원가입하기</Link>
         </div>
       </div>

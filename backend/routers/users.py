@@ -8,7 +8,7 @@ import random
 
 import models, schemas, auth
 from database import get_db
-from email_utils import send_verification_email, send_verification_code_email
+from email_utils import send_verification_email, send_verification_code_email, send_password_reset_code_email
 
 router = APIRouter()
 
@@ -253,3 +253,112 @@ def get_my_progress(current_user: models.User = Depends(auth.get_current_user), 
     
     items = db.query(models.Buleum).filter(models.Buleum.id.in_(buleum_ids)).order_by(models.Buleum.created_at.desc()).all()
     return items
+
+
+# ========================
+# 비밀번호 찾기 (재설정)
+# ========================
+
+@router.post("/auth/forgot-password")
+def forgot_password(body: schemas.ForgotPasswordRequest, db: Session = Depends(get_db)):
+    """비밀번호 재설정을 위한 6자리 인증코드를 이메일로 발송합니다."""
+    
+    # 가입된 이메일인지 확인 (보안: 미가입이어도 동일 응답)
+    user = db.query(models.User).filter(models.User.email == body.email).first()
+    if not user:
+        # 보안을 위해 이메일 존재 여부를 노출하지 않음
+        return {"message": "RESET_CODE_SENT"}
+    
+    # 6자리 난수 생성
+    code = str(random.randint(100000, 999999))
+    expires_at = datetime.utcnow() + timedelta(minutes=5)
+    
+    # 기존 인증 레코드가 있다면 업데이트, 없으면 새로 생성
+    existing = db.query(models.EmailVerification).filter(
+        models.EmailVerification.email == body.email
+    ).first()
+    
+    if existing:
+        existing.code = code
+        existing.expires_at = expires_at
+        existing.is_verified = False
+        existing.created_at = datetime.utcnow()
+    else:
+        new_verification = models.EmailVerification(
+            email=body.email,
+            code=code,
+            expires_at=expires_at,
+            is_verified=False
+        )
+        db.add(new_verification)
+    
+    db.commit()
+    
+    # 비밀번호 재설정 인증코드 이메일 발송
+    try:
+        send_password_reset_code_email(body.email, code)
+    except Exception as e:
+        print(f"[Warning] Failed to send password reset code email: {e}")
+        raise HTTPException(status_code=500, detail="EMAIL_SEND_FAILED")
+    
+    return {"message": "RESET_CODE_SENT"}
+
+
+@router.post("/auth/verify-reset-code")
+def verify_reset_code(body: schemas.VerifyCode, db: Session = Depends(get_db)):
+    """비밀번호 재설정용 6자리 인증코드를 검증합니다."""
+    
+    record = db.query(models.EmailVerification).filter(
+        models.EmailVerification.email == body.email
+    ).first()
+    
+    if not record:
+        raise HTTPException(status_code=400, detail="NO_VERIFICATION_RECORD")
+    
+    # 만료 확인
+    if record.expires_at < datetime.utcnow():
+        raise HTTPException(status_code=400, detail="CODE_EXPIRED")
+    
+    # 코드 일치 확인
+    if record.code != body.code:
+        raise HTTPException(status_code=400, detail="INVALID_CODE")
+    
+    # 인증 성공 처리
+    record.is_verified = True
+    db.commit()
+    
+    return {"message": "RESET_CODE_VERIFIED"}
+
+
+@router.post("/auth/reset-password")
+def reset_password(body: schemas.ResetPasswordRequest, db: Session = Depends(get_db)):
+    """인증 완료 후 새 비밀번호를 설정합니다."""
+    
+    # 인증 완료된 레코드가 있는지 교차 검증
+    verification = db.query(models.EmailVerification).filter(
+        models.EmailVerification.email == body.email,
+        models.EmailVerification.is_verified == True
+    ).first()
+    
+    if not verification:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="VERIFICATION_REQUIRED"
+        )
+    
+    # 사용자 조회
+    user = db.query(models.User).filter(models.User.email == body.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="USER_NOT_FOUND")
+    
+    # 새 비밀번호 해시 생성 및 업데이트
+    user.password_hash = auth.get_password_hash(body.new_password)
+    
+    # 사용된 인증 레코드 삭제 (일회용 보장)
+    db.query(models.EmailVerification).filter(
+        models.EmailVerification.email == body.email
+    ).delete()
+    
+    db.commit()
+    
+    return {"message": "PASSWORD_RESET_SUCCESS"}

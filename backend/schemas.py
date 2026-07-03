@@ -225,3 +225,64 @@ class SendVerificationCode(BaseModel):
 class VerifyCode(BaseModel):
     email: EmailStr
     code: str
+
+# ========================
+# AI 관리 API 전용 Schemas
+# ========================
+class AISimulatedUserCreate(BaseModel):
+    """AI가 가상 사용자를 생성할 때 사용하는 스키마"""
+    email: EmailStr
+    nickname: str
+    location: Optional[str] = None
+    profile_image_url: Optional[str] = None
+    manner_temperature: Optional[float] = 36.5
+
+class AISimulatedUserResponse(BaseModel):
+    """가상 사용자 조회 응답 스키마"""
+    id: int
+    email: EmailStr
+    nickname: str
+    location: Optional[str]
+    manner_temperature: float
+    profile_image_url: Optional[str]
+    is_simulated: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class AIBuleumCreate(BaseModel):
+    """AI가 가상 사용자 명의로 심부름 게시글을 등록할 때 사용하는 스키마"""
+    user_id: int
+    title: str
+    price: int
+    description: str
+    location: str
+    image_url: Optional[str] = None
+
+class AIPendingChatRoom(BaseModel):
+    """AI가 답장하지 않은 채팅방 정보 스키마"""
+    room_id: int
+    buleum_id: Optional[int]
+    buleum_title: Optional[str]
+    simulated_user_id: int
+    simulated_user_nickname: str
+    real_user_id: int
+    real_user_nickname: str
+    last_message_content: str
+    last_message_time: datetime
+    unanswered_count: int
+
+class AIChatReply(BaseModel):
+    """AI가 가상 사용자 대신 채팅 답장을 보낼 때 사용하는 스키마"""
+    content: str
+
+# ========================
+# Password Reset Schemas
+# ========================
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    new_password: str

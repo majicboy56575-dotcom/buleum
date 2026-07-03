@@ -17,6 +17,7 @@ class User(Base):
     verification_token = Column(String, nullable=True, index=True)
     verification_token_expires = Column(DateTime, nullable=True)
     is_admin = Column(Boolean, default=False)
+    is_simulated = Column(Boolean, default=False)  # AI가 관리하는 가상 사용자 여부
     created_at = Column(DateTime, default=datetime.utcnow)
 
     buleums = relationship("Buleum", back_populates="user")

@@ -22,6 +22,8 @@ import Review from './pages/Review';
 import Verification from './pages/Verification';
 import AdminDashboard from './pages/AdminDashboard';
 import CustomerCenter from './pages/CustomerCenter';
+import Notices from './pages/Notices';
+import ForgotPassword from './pages/ForgotPassword';
 import './styles/index.css';
 
 function App() {
@@ -51,6 +53,8 @@ function App() {
             <Route path="/verify" element={<Verification />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/customer-center" element={<CustomerCenter />} />
+            <Route path="/notices" element={<Notices />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             {/* Fallback for other routes */}
             <Route path="*" element={<Home />} />
           </Routes>

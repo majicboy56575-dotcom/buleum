@@ -10,7 +10,7 @@ from jose import JWTError, jwt
 import os
 import models, auth
 
-from routers import users, items, town, chat, others, admin
+from routers import users, items, town, chat, others, admin, ai
 
 # 애플리케이션 시작 시 DB 테이블 자동 생성 (buleum.db)
 models.Base.metadata.create_all(bind=engine)
@@ -59,6 +59,7 @@ app.include_router(town.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
 app.include_router(others.router, prefix="/api")
 app.include_router(admin.router, prefix="/api/admin")
+app.include_router(ai.router, prefix="/api/ai")
 
 @app.get("/")
 def read_root():

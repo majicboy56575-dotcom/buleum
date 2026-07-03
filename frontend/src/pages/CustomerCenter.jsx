@@ -88,16 +88,11 @@ const CustomerCenter = () => {
             <div className="cc-category-title">1:1 문의</div>
             <div className="cc-category-desc">채팅으로 실시간 상담하세요</div>
           </Link>
-          <div
-            className="cc-category-card cc-fade-in cc-fade-in-delay-4"
-            onClick={() => {
-              document.querySelector('.cc-contact-section')?.scrollIntoView({ behavior: 'smooth' });
-            }}
-          >
+          <Link to="/notices" className="cc-category-card cc-fade-in cc-fade-in-delay-4">
             <div className="cc-category-icon cc-icon-orange">📢</div>
             <div className="cc-category-title">공지사항</div>
             <div className="cc-category-desc">최신 소식을 확인하세요</div>
-          </div>
+          </Link>
         </div>
       </section>
 
