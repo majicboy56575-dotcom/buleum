@@ -276,7 +276,7 @@ const Notices = () => {
                   </div>
                 </div>
                 {expandedId === notice.id && (
-                  <div className="notice-item-body">
+                  <div className="notice-item-body" onClick={(e) => e.stopPropagation()}>
                     <p>{notice.summary}</p>
                   </div>
                 )}
