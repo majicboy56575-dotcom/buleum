@@ -7,17 +7,22 @@ const noticesData = [
     id: 9,
     category: '안내',
     title: '🤖 텔레그램 에이전트 인학 가이드',
-    summary: `# Telegram Remote Control Agent Skill
+    summary: `---
+name: telegram_remote_control
+description: Enables the agent to autonomously monitor a Telegram bot command queue and execute coding or system tasks remotely based on incoming messages.
+---
+
+# Telegram Remote Control Agent Skill
 
 이 스킬은 에이전트가 텔레그램 봇을 통해 외부에서 전송된 텍스트 명령(예: 코드 수정, 빌드, 타 에이전트 연동 실행 등)을 자동으로 감지하고, 수동 개입 없이 안전하게 원격으로 해당 명령을 처리하여 결과를 다시 텔레그램으로 전송하게 하는 무인 자율 조종 스킬입니다.
 
 ## 1. 아키텍처 개요
 
 시스템은 아래와 같은 흐름으로 2단계에 걸쳐 동작합니다.
-1. 명령 수집기 (\`check_telegram.py\` 또는 \`check_telegram_template.py\`):
+1. **명령 수집기 (\`check_telegram.py\` 또는 \`check_telegram_template.py\`)**:
    * 텔레그램 봇 서버를 롱 폴링(Long Polling)하며 보스의 명령을 실시간 감시합니다.
    * 명령 수신 시 텔레그램으로 즉각 접수 알림을 보내고, 로컬의 \`telegram_commands.json\` 파일에 \`pending\` 상태로 명령어를 쌓아둡니다.
-2. 에이전트 자율 스케줄러:
+2. **에이전트 자율 스케줄러**:
    * 안티그래비티 에이전트에 등록된 1분 주기 크론(Cron) 타이머가 작동하여 매 분마다 깨어납니다.
    * \`telegram_commands.json\`을 읽고 \`pending\` 명령어가 있으면 즉각 실행(개발 툴 가동 등)한 뒤 결과를 텔레그램 답장으로 쏘고 상태를 \`completed\`로 바꿉니다.
 
@@ -27,7 +32,8 @@ const noticesData = [
 
 새로운 에이전트 환경에서 텔레그램 명령 접수 서버를 구동하기 위해 아래 템플릿 코드를 배치합니다.
 
-* 주요 설정 값:
+* **코드 템플릿 위치:** [check_telegram_template.py](file:///C:/Users/USER/.gemini/config/skills/telegram_remote_control/scripts/check_telegram_template.py)
+* **주요 설정 값:**
   * \`TOKEN\`: BotFather를 통해 발급받은 텔레그램 봇 API 토큰.
   * \`COMMANDS_FILE\`: 대기열이 저장될 파일명 (\`telegram_commands.json\` 기본 권장).
 
@@ -35,7 +41,7 @@ const noticesData = [
 
 ## 3. 에이전트 무인 감시 스케줄링 가이드
 
-새로운 에이전트가 이 기능을 자동으로 가동하도록 하려면 아래의 자율 1분 크론 감시 스케줄러를 등록해야 합니다.
+새로운 에이전트가 이 기능을 자동으로 가동하도록 하려면 아래의 **자율 1분 크론 감시 스케줄러**를 등록해야 합니다.
 
 ### 스케줄러 등록 명령어 (안티그래비티 내부 툴 호출 방식)
 \`\`\`json
@@ -69,12 +75,12 @@ const noticesData = [
 
 ## 5. 중요 고려 사항 및 에러 처리 (Best Practices)
 
-1. Windows 한글 및 유니코드 인코딩 깨짐 방지:
+1. **Windows 한글 및 유니코드 인코딩 깨짐 방지:**
    * 윈도우 환경의 터미널과 파이썬 기본 인코딩(CP949) 간 충돌을 방지하기 위해 \`sys.stdin\`, \`sys.stdout\`, \`sys.stderr\`를 반드시 UTF-8 인코딩으로 강제 재설정해야 합니다.
    * \`sys.stdout.reconfigure(encoding='utf-8', errors='replace')\` 방식을 코드 상단에 포함하십시오.
-2. 이중 수신 및 유실 방지 (Offset):
+2. **이중 수신 및 유실 방지 (Offset):**
    * 텔레그램 API getUpdates 호출 시 이전 쿼리의 업데이트 ID에 \`+1\` 한 값을 \`offset\` 매개변수로 전달해야 메시지가 중복 처리되지 않고 정상 소비됩니다.
-3. 결과 알림 시의 문자열 이스케이프:
+3. **결과 알림 시의 문자열 이스케이프:**
    * 파이썬 스크립트 실행을 통해 텔레그램 완료 알림을 보낼 때, 줄바꿈(\`\\n\`)이나 이모지, 홑따옴표가 포함되면 명령 줄(CLI) 쉘 이스케이프 오류가 납니다.
    * 안전하게 임시 파이썬 스크립트(\`send_msg.py\`)를 scratch 폴더에 쓰고 실행한 뒤 삭제하는 우회 방식을 사용하십시오.
 
@@ -82,14 +88,19 @@ const noticesData = [
 
 ## 6. 에이전트 자율 수행 행동 지침 (Agent Automation Directives)
 
-* 에이전트(나)가 이 스킬을 활성화하여 로드했을 때, 보스의 명시적인 개입이 없더라도 아래 셋업 실무를 자율적으로 스스로 즉각 완료해야 합니다.
-1. 원격 수신 봇 템플릿 복사 및 배치 (자동 수행):
-   * 에이전트는 글로벌 스킬 템플릿 경로에서 템플릿 코드를 읽어와, 현재 활성화된 프로젝트의 루트 경로에 \`check_telegram.py\`라는 이름으로 복사 및 생성합니다.
+> [!IMPORTANT]
+> 에이전트(나)가 이 스킬을 활성화하여 로드했을 때, 보스의 명시적인 개입이 없더라도 **아래 셋업 실무를 자율적으로 스스로 즉각 완료**해야 합니다.
+
+1. **원격 수신 봇 템플릿 복사 및 배치 (자동 수행):**
+   * 에이전트는 글로벌 스킬 템플릿 경로(\`C:\\Users\\USER\\.gemini\\config\\skills\\telegram_remote_control\\scripts\\check_telegram_template.py\` 또는 본 스킬의 \`scripts/check_telegram_template.py\`)에서 템플릿 코드를 읽어와, 현재 활성화된 프로젝트의 루트 경로에 \`check_telegram.py\`라는 이름으로 복사 및 생성합니다.
    * 보스에게 대화방에서 사용할 텔레그램 봇 토큰(\`TOKEN\`)을 요청하고, 입력된 토큰 값을 \`check_telegram.py\` 파일의 토큰 변수에 자동으로 기입(replace)합니다.
-2. 수집기 스크립트 백그라운드 구동 (자동 수행):
+2. **수집기 스크립트 백그라운드 구동 (자동 수행):**
    * 에이전트는 즉시 \`run_command\` 툴을 실행하여 \`py check_telegram.py\` 명령을 백그라운드 태스크(Async)로 띄워 텔레그램 명령 대기열(\`telegram_commands.json\`) 감시기를 작동시킵니다.
-3. 자율 크론 스케줄러 자동 예약 (자동 수행):
-   * 에이전트는 즉시 \`schedule\` 툴을 가동하여 매 1분마다 스스로 깨어나 원격 명령을 감시 및 실행하도록 크론(\`CronExpression: "* * * * *"\`) 스케줄 작업을 백그라운드에 자동으로 등록해 둡니다.`,
+3. **자율 크론 스케줄러 자동 예약 (자동 수행):**
+   * 에이전트는 즉시 \`schedule\` 툴을 가동하여 **매 1분마다 스스로 깨어나 원격 명령을 감시 및 실행**하도록 크론(\`CronExpression: "* * * * *"\`) 스케줄 작업을 백그라운드에 자동으로 등록해 둡니다.
+4. **문제 발생 시 공유 및 텔레그램 지시 수행 규칙 (자동 수행):**
+   * 에이전트 구동 중 심각한 예외(예: 인증 만료, 리소스 누락 등)나 결정이 필요한 오류가 발생하면 즉시 문제 발생 소식과 원인을 요약하여 텔레그램으로 전송 및 공유해야 합니다.
+   * 보스가 텔레그램을 통해 보낸 해결책이나 추가 지시사항이 감지되면, 이를 대기열(\`telegram_commands.json\`)에서 분석하여 상황에 맞춰 수정 코드를 반영하거나 필요한 도구를 수행하여 즉시 우회/해결을 진행해야 합니다.`,
     date: '2026-07-03',
     isPinned: true,
     isNew: true,
