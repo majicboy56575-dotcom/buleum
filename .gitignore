@@ -18,3 +18,8 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Secrets & Credentials
+*firebase-adminsdk*.json
+*.deprecated
+

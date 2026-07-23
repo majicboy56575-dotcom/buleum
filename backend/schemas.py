@@ -10,6 +10,7 @@ class UserCreate(BaseModel):
     password: str
     nickname: str
     location: Optional[str] = None
+    firebase_token: str
 
 class UserUpdate(BaseModel):
     nickname: Optional[str] = None
@@ -217,18 +218,10 @@ class VerificationResponse(BaseModel):
         from_attributes = True
 
 # ========================
-# Email Verification Code Schemas
+# Email Verification Code Schemas (레거시 - 더 이상 사용하지 않음)
+# Firebase Authentication으로 대체됨
 # ========================
-class SendVerificationCode(BaseModel):
-    email: EmailStr
 
-class VerifyCode(BaseModel):
-    email: EmailStr
-    code: str
-
-# ========================
-# AI 관리 API 전용 Schemas
-# ========================
 class AISimulatedUserCreate(BaseModel):
     """AI가 가상 사용자를 생성할 때 사용하는 스키마"""
     email: EmailStr
@@ -278,11 +271,6 @@ class AIChatReply(BaseModel):
     content: str
 
 # ========================
-# Password Reset Schemas
+# Password Reset Schemas (레거시 - 더 이상 사용하지 않음)
+# Firebase Authentication의 sendPasswordResetEmail로 대체됨
 # ========================
-class ForgotPasswordRequest(BaseModel):
-    email: EmailStr
-
-class ResetPasswordRequest(BaseModel):
-    email: EmailStr
-    new_password: str

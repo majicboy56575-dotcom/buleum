@@ -11,9 +11,13 @@ import os
 import models, auth
 
 from routers import users, items, town, chat, others, admin, ai
+from firebase_config import initialize_firebase
 
 # 애플리케이션 시작 시 DB 테이블 자동 생성 (buleum.db)
 models.Base.metadata.create_all(bind=engine)
+
+# Firebase Admin SDK 초기화
+initialize_firebase()
 
 # 관리자 계정 시딩 (admin@gmail.com / pass123)
 def seed_admin():
