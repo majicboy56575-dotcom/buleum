@@ -137,6 +137,30 @@ dummy_contents = [
     }
 ]
 
+# 20개의 리얼한 사용자 이메일 (네이버)
+dummy_emails = [
+    "hyodo_prince99@naver.com",
+    "warm_hand88@naver.com",
+    "momlove_2024@naver.com",
+    "strong_son95@naver.com",
+    "good_neighbor77@naver.com",
+    "town_bro89@naver.com",
+    "heartcare365@naver.com",
+    "rundaughter_01@naver.com",
+    "sweet_spring93@naver.com",
+    "happyhelper_7@naver.com",
+    "dj_helper042@naver.com",
+    "mom_smile58@naver.com",
+    "hyoja_grandson@naver.com",
+    "warmtea_77@naver.com",
+    "dujeong_hero@naver.com",
+    "loveworker_0314@naver.com",
+    "youth_v77@naver.com",
+    "always_side90@naver.com",
+    "neighbor82@naver.com",
+    "minsu_v91@naver.com"
+]
+
 def create_dummies():
     db: Session = SessionLocal()
     try:
@@ -153,7 +177,7 @@ def create_dummies():
         dummy_users = []
         for idx, nick in enumerate(nicknames):
             user = models.User(
-                email=f"dummy{idx+1}@buleum.com",
+                email=dummy_emails[idx],
                 password_hash=auth.get_password_hash("dummy1234"),
                 nickname=nick,
                 location=dummy_contents[idx]["location"],
